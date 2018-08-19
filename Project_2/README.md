@@ -71,7 +71,7 @@ blockchain.validateChain();
   }
 })();
 ```
-8: Validate blockchain. The chain should now fail with blocks 2,4, and 7.
+8: Validate blockchain. The chain should now fail with blocks 2, 4, 5, 7 and 9.
 ```
 blockchain.validateChain();
 ```
