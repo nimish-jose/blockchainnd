@@ -118,7 +118,7 @@ class Blockchain{
   getBlockHeight(){
     // I have chosen to maintain chain length as a variable
     // rather than calculating height everytime I need to add a block
-    return this.chainLength;
+    return this.chainLength - 1;
   }
 
   // get block
@@ -158,7 +158,7 @@ class Blockchain{
     let that = this;
     let errorLog = [];
     let promises = [];
-    if (this.chainLength > 1) {
+    if (that.chainLength > 1) {
       // If chain has multiple blocks
       for (let i = 0; i < that.chainLength-1; i++) {
         // validate block
@@ -181,11 +181,12 @@ class Blockchain{
         });
         promises.push(promiseCompareHashes);
       }
-    } else if (this.chainLength === 1) {
-      // if chain has only the genesis block then we only need to validate it
-      let promiseBlockValidate = that.validateBlock(0).then(result => {
+    }
+    if (that.chainLength > 0) {
+      // We must validate the last block as the above check doesn't do the same
+      let promiseBlockValidate = that.validateBlock(that.chainLength-1).then(result => {
         if(!result) {
-          errorLog.push(i);
+          errorLog.push(that.chainLength-1);
         }
       });
       promises.push(promiseBlockValidate);
