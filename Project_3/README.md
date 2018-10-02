@@ -60,13 +60,13 @@ npm install body-parser --save
 ## Testing
 
 To test code:
-1: Open a command prompt or shell terminal after install node.js.
-2: Run the web server
+1. Open a command prompt or shell terminal after install node.js.
+2. Run the web server
 ```
 node index.js
 ```
-3: Send a GET request on the url http://localhost:8000/block/[blockheight]
-4: Send a POST request on the url http://localhost:8000/block. Make sure to set the 'Content-Type' header parameter to 'application/json; charset=UTF-8'. The json passed in the body should be of the format as shown below
+3. Send a GET request on the url http://localhost:8000/block/[blockheight]
+4. Send a POST request on the url http://localhost:8000/block. Make sure to set the 'Content-Type' header parameter to 'application/json; charset=UTF-8'. The json passed in the body should be of the format as shown below
 ```
 {
       "body": "Testing block with test string data"
