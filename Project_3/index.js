@@ -8,7 +8,7 @@ const simpleChain = require('./simpleChain.js')
 
 let blockchain = new simpleChain.Blockchain();
 
-app.get('/block/:blockHeight', function (req, res, next) {
+app.get('/block/:blockHeight', (req, res, next) => {
 	let blockHeight = req.params.blockHeight;
   // Validate that reqquested block height is present on the blockchain
   if (blockHeight > blockchain.getBlockHeight()) {
@@ -19,9 +19,9 @@ app.get('/block/:blockHeight', function (req, res, next) {
 });
 
 
-app.post('/block', jsonParser, function (req, res, next) {
+app.post('/block', jsonParser, (req, res, next) => {
   // Valide that we have a valid request
-  if (!req.body || !req.body.body) return res.sendStatus(400);
+  if (!req.body || !req.body.body || !(typeof req.body.body === 'string')) return res.sendStatus(400);
   blockchain.addBlock(new simpleChain.Block(req.body.body)).then(block => res.send(block)).catch(next);
 });
 
