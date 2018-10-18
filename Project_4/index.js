@@ -13,7 +13,7 @@ let blockchain = new simpleChain.Blockchain();
 const validationWindow = 300; // 5 mins
 // Map from wallet address to validation request timestamp
 let blockchainIDValidationTimeoutMap = new Map();
-// Map from wallet address to check if validation status
+// Map from wallet address to check validation status
 let blockchainIDValidatedMap = new Map();
 // Map from wallet address to array of block heights assigned with that address
 let blockchainIDToBlocksMap = new Map();
@@ -22,14 +22,17 @@ let blockHashToBlockMap = new Map();
 
 // Populate maps from block
 function populateMapsFromBlock(block) {
-  let blockchainID = block.body.address;
-  let blocks = blockchainIDToBlocksMap.get(blockchainID);
-  if (blocks === undefined) {
-    blocks = [];
+  // We should populate maps only if the block body has an address and star object, else we can ignore it
+  if (block.body.address && block.body.star) {
+    let blockchainID = block.body.address;
+    let blocks = blockchainIDToBlocksMap.get(blockchainID);
+    if (blocks === undefined) {
+      blocks = [];
+    }
+    blocks.push(block.height);
+    blockchainIDToBlocksMap.set(blockchainID, blocks);
+    blockHashToBlockMap.set(block.hash, block.height);
   }
-  blocks.push(block.height);
-  blockchainIDToBlocksMap.set(blockchainID, blocks);
-  blockHashToBlockMap.set(block.hash, block.height);
 }
 
 // Populate maps by reading all blocks from the blockchain
