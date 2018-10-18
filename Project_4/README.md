@@ -45,8 +45,15 @@ Header -
 
 Body -
 {
-      "address": [address],
-      "star": [star-details]
+	"address": [address],
+	"star": {
+		"dec": [declination],
+		"ra": [right_ascension],
+		"magnitude": [magnitude], // optional
+		"constellation": [constellation], // optional
+		"story": [story]
+	}
+
 }
 ```
 
@@ -110,7 +117,7 @@ npm install bitcoinjs-message --save
 ## Testing
 
 To test code:
-1. Open a command prompt or shell terminal after install node.js.
+1. Open a command prompt or shell terminal after installing node.js.
 2. Run the web server
 ```
 node index.js
