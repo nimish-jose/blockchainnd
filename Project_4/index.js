@@ -40,7 +40,7 @@ function populateMaps() {
   // Populate maps by reading the entire blockchain
   let indices = [];
   let blockHeight = blockchain.getBlockHeight();
-  // Skip genesis block
+  // Skip genesis block as there is no star information on it
   if (blockHeight > 0) {
     let promises = [];
     for (let i = 1; i <= blockHeight; i++) {
@@ -142,6 +142,20 @@ app.post('/message-signature/validate', jsonParser, (req, res, next) => {
   }
 });
 
+// Check if string has only ASCII characters
+function isValidASCIIString(str){
+    if(typeof(str)!=='string'){
+        return false;
+    }
+    for(var i=0;i<str.length;i++){
+        if(str.charCodeAt(i)>127){
+            return false;
+        }
+    }
+    return true;
+}
+
+
 app.post('/block', jsonParser, (req, res, next) => {
   // Valide that we have a valid request
   if (!req.body ||
@@ -149,7 +163,7 @@ app.post('/block', jsonParser, (req, res, next) => {
       !req.body.star || !(typeof req.body.star === 'object') ||
       !req.body.star.dec || !(typeof req.body.star.dec === 'string') ||
       !req.body.star.ra || !(typeof req.body.star.ra === 'string') ||
-      !req.body.star.story || !(typeof req.body.star.story === 'string') || (req.body.star.story.length > 500)) {
+      !req.body.star.story || !isValidASCIIString(req.body.star.story) || (req.body.star.story.length > 500)) {
     return res.sendStatus(400);
   }
 
@@ -166,13 +180,21 @@ app.post('/block', jsonParser, (req, res, next) => {
 
   blockchain.addBlock(new simpleChain.Block(blockBody)).then(block => {
     populateMapsFromBlock(block);
+
+    // Reset validation status by deleting key from validated map and validation timeout map
+    // The user will need to re-request validation
+    blockchainIDValidatedMap.delete(blockBody.address);
+    blockchainIDValidationTimeoutMap.delete(blockBody.address);
+
     res.send(block)
   }).catch(next);
 });
 
 // Decodes story from hex to ascii
 function decodeBlock(block) {
-  block.body.star.storyDecoded = new Buffer.from(block.body.star.story, 'hex').toString();
+  if (block.body.star) {
+    block.body.star.storyDecoded = new Buffer.from(block.body.star.story, 'hex').toString();
+  }
   return block;
 }
 
@@ -199,9 +221,10 @@ app.get('/stars/hash::hash', (req, res, next) => {
 
 app.get('/block/:blockHeight', (req, res, next) => {
   let blockHeight = parseInt(req.params.blockHeight);
-  // Validate that requested block height is greater than 0 as that is the genesis block
-  if (blockHeight === 0) {
-    return res.sendStatus(400);
+  // Validate that requested block height is non-negative
+  if (blockHeight < 0) {
+    res.status(500);
+    return res.send({'error': 'Negative block height requested'});
   }
   // Validate that requested block height is present on the blockchain
   if (blockHeight > blockchain.getBlockHeight()) {
