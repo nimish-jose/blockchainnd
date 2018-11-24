@@ -35,6 +35,7 @@ truffle test
 
 ### Deploying contract
 
+- Set wallet's mnemonic in truffle.js where "INSERT_MNEMONIC_HERE" is mentioned
 - Migrate contracts to rinkeby
 ```
 truffle migrate --network rinkeby --reset
