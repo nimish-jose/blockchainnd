@@ -516,11 +516,38 @@
                       "payable": true,
                       "stateMutability": "payable",
                       "type": "function"
+                    },
+                    {
+                      "constant": true,
+                      "inputs": [
+                        {
+                          "name": "_ra",
+                          "type": "string"
+                        },
+                        {
+                          "name": "_dec",
+                          "type": "string"
+                        },
+                        {
+                          "name": "_mag",
+                          "type": "string"
+                        }
+                      ],
+                      "name": "checkIfStarExist",
+                      "outputs": [
+                        {
+                          "name": "",
+                          "type": "bool"
+                        }
+                      ],
+                      "payable": false,
+                      "stateMutability": "view",
+                      "type": "function"
                     }
                 ]
             );
             // Grab the contract at specified deployed address with the interface defined by the ABI
-            var starNotary = StarNotary.at('0x40b6713eb1e3576b963773b26c213f63418f96fc');
+            var starNotary = StarNotary.at('0x98f5c7ad1a22f56d42cf4cc169ea3b00ec17d649');
 
             // Enable claim button being clicked
             function claimButtonClicked() { 
@@ -548,7 +575,7 @@
                 })
             }
 
-            // Enable search buttone being clicked
+            // Enable search button being clicked
             function seachStarInfoClicked() {
                 let tokenId = parseInt(document.getElementById('search-token-id').value)
                 starNotary.tokenIdToStarInfo(tokenId, function(error, starInfo) {

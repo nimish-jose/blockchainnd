@@ -26,6 +26,20 @@ contract('StarNotary', accounts => {
         })
     })
 
+    describe('star exists', () => {
+        it('can create a star and check if it exists', async function () {
+            await this.contract.createStar(name, starStory, ra, dec, mag, starId, {from: user1})
+
+            let status = await this.contract.checkIfStarExist(ra, dec, mag)
+            assert.equal(status, true)
+        })
+
+        it('checking existence for stars not created should fail', async function () {
+            let status = await this.contract.checkIfStarExist(ra, dec, mag)
+            assert.equal(status, false)
+        })
+    })
+
     describe('star uniqueness', () => {
         it('only unique stars can be minted', async function() {
             await this.contract.createStar(name, starStory, ra, dec, mag, starId, {from: user1})

@@ -17,14 +17,11 @@ contract StarNotary is ERC721 {
     mapping(bytes32 => uint256) public coordinatesHashToTokenId;
 
     function createStar(string _name, string _starStory, string _ra, string _dec, string _mag, uint256 _tokenId) public { 
+        require(!checkIfStarExist(_ra, _dec, _mag));
+
         Star memory newStar = Star(_name, _starStory, _ra, _dec, _mag);
-
-        // Note since we are hashing strings, any variations in providing star coordinates will not be caught
-        bytes32 coordinatesHash = keccak256(abi.encodePacked(_ra, _dec, _mag));
-
-        // This should be the first time we are getting the star coordinates
-        require(coordinatesHashToTokenId[coordinatesHash] == 0);
-
+    
+        bytes32 coordinatesHash = hashCoordinates(_ra, _dec, _mag);
         coordinatesHashToTokenId[coordinatesHash] = _tokenId;
 
         tokenIdToStarInfo[_tokenId] = newStar;
@@ -54,4 +51,18 @@ contract StarNotary is ERC721 {
             msg.sender.transfer(msg.value - starCost);
         }
     }
+
+    // We are only using star coordinates and not the token ID as that will be handled internally by the ERC721 token implementation
+    function checkIfStarExist(string _ra, string _dec, string _mag) public view returns (bool) {
+        bytes32 coordinatesHash = hashCoordinates(_ra, _dec, _mag);
+
+        // This should be the first time we are getting the star coordinates
+        return (coordinatesHashToTokenId[coordinatesHash] != 0);
+    }
+
+    function hashCoordinates(string _ra, string _dec, string _mag) internal pure returns (bytes32) {
+        // Note since we are hashing strings, any variations in providing star coordinates will not be caught
+        return keccak256(abi.encodePacked(_ra, _dec, _mag));
+    }
+
 }

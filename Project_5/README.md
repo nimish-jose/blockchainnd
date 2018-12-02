@@ -49,19 +49,19 @@ truffle console --network rinkeby
 ```
 - Create Star
 ```
-StarNotary.at("0x40b6713eb1e3576b963773b26c213f63418f96fc").createStar("awesome star!", "this star was bought while travelling to NY", "1", "1", "1", 1)
+StarNotary.at("0x98f5c7ad1a22f56d42cf4cc169ea3b00ec17d649").createStar("awesome star!", "this star was bought while travelling to NY", "1", "1", "1", 1)
 ```
 - Put Star up for sale
 ```
 starPrice = web3.toWei(.01, "ether")
-StarNotary.at("0x40b6713eb1e3576b963773b26c213f63418f96fc").putStarUpForSale(1, starPrice)
+StarNotary.at("0x98f5c7ad1a22f56d42cf4cc169ea3b00ec17d649").putStarUpForSale(1, starPrice)
 ```
 
 ### Details of contract deployment and usage
 
-- Contract deployed at https://rinkeby.etherscan.io/address/0x40b6713eb1e3576b963773b26c213f63418f96fc
-- Star creation at https://rinkeby.etherscan.io/tx/0x13825bc373012992c5949ca771083a9ce34ec22f4015e7c148eb10c8f9d38e3d
-- Star put up for sale at https://rinkeby.etherscan.io/tx/0xb6d21e583808dbde20c62fe14f04eb2b77c7b1586cd80709f6255e3e088caf76
+- Contract deployed at https://rinkeby.etherscan.io/address/0x98f5c7ad1a22f56d42cf4cc169ea3b00ec17d649
+- Star creation at https://rinkeby.etherscan.io/tx/0xf71ec6e9a450225e467094de936fc4024d63dde88cb31617e9fb2f95b91861ea
+- Star put up for sale at https://rinkeby.etherscan.io/tx/0x341b6755e7ac8741df86a1abb1316f0d8f235a176650846682a5e81376c8d7ee
 
 ### Frontend code
 
