@@ -1,5 +1,7 @@
 const StarNotary = artifacts.require('StarNotary')
 
+const itParam = require('mocha-param')
+
 contract('StarNotary', accounts => { 
 
     let user1 = accounts[1]
@@ -13,56 +15,60 @@ contract('StarNotary', accounts => {
     let mag = "1"
     let starId = 1
 
+    let contract
+
     beforeEach(async function() { 
-        this.contract = await StarNotary.new({from: accounts[0]})
+        contract = await StarNotary.new({from: accounts[0]})
     })
     
     describe('can create a star', () => {
         it('can create a star and get its name', async function () { 
-            await this.contract.createStar(name, starStory, ra, dec, mag, starId, {from: user1})
+            await contract.createStar(name, starStory, ra, dec, mag, starId, {from: user1})
 
-            let starInfo = await this.contract.tokenIdToStarInfo(starId)
+            let starInfo = await contract.tokenIdToStarInfo(starId)
             assert.equal(starInfo[0], name)
         })
     })
 
     describe('star exists', () => {
         it('can create a star and check if it exists', async function () {
-            await this.contract.createStar(name, starStory, ra, dec, mag, starId, {from: user1})
+            await contract.createStar(name, starStory, ra, dec, mag, starId, {from: user1})
 
-            let status = await this.contract.checkIfStarExist(ra, dec, mag)
+            let status = await contract.checkIfStarExist(ra, dec, mag)
             assert.equal(status, true)
         })
 
         it('checking existence for stars not created should fail', async function () {
-            let status = await this.contract.checkIfStarExist(ra, dec, mag)
+            let status = await contract.checkIfStarExist(ra, dec, mag)
             assert.equal(status, false)
         })
     })
 
     describe('star uniqueness', () => {
         it('only unique stars can be minted', async function() {
-            await this.contract.createStar(name, starStory, ra, dec, mag, starId, {from: user1})
-            expectThrow(this.contract.createStar(name, starStory, ra, dec, mag, starId, {from: user1}))
+            await contract.createStar(name, starStory, ra, dec, mag, starId, {from: user1})
+            expectThrow(contract.createStar(name, starStory, ra, dec, mag, starId, {from: user1}))
         })
 
         it('only unique stars can be minted even if their ID is different', async function() { 
-            await this.contract.createStar(name, starStory, ra, dec, mag, starId, {from: user1})
-            expectThrow(this.contract.createStar(name, starStory, ra, dec, mag, starId + 1, {from: user1}))
+            await contract.createStar(name, starStory, ra, dec, mag, starId, {from: user1})
+            expectThrow(contract.createStar(name, starStory, ra, dec, mag, starId + 1, {from: user1}))
         })
 
-        it('minting unique stars does not fail', async function() { 
-            for(let i = 0; i < 10; i ++) { 
-                let id = i
-                let newRa = i.toString()
-                let newDec = i.toString()
-                let newMag = i.toString()
+        var values = [];
+        for (let i = 1; i < 10; i++) {
+           values.push(i);
+        }
 
-                await this.contract.createStar(name, starStory, newRa, newDec, newMag, id, {from: user1})
+        itParam('minting unique stars does not fail', values, async function(id) {
+            let newRa = id.toString()
+            let newDec = id.toString()
+            let newMag = id.toString()
 
-                let starInfo = await this.contract.tokenIdToStarInfo(id)
-                assert.equal(starInfo[0], name)
-            }
+            await contract.createStar(name, starStory, newRa, newDec, newMag, id, {from: user1})
+
+            let starInfo = await contract.tokenIdToStarInfo(id)
+            assert.equal(starInfo[0], name)
         })
     })
 
@@ -71,30 +77,29 @@ contract('StarNotary', accounts => {
         let starPrice = web3.toWei(.01, "ether")
 
         beforeEach(async function () { 
-            await this.contract.createStar(name, starStory, ra, dec, mag, starId, {from: user1})
+            await contract.createStar(name, starStory, ra, dec, mag, starId, {from: user1})
         })
 
-        it('user1 can put up their star for sale', async function () { 
-            assert.equal(await this.contract.ownerOf(starId), user1)
-            await this.contract.putStarUpForSale(starId, starPrice, {from: user1})
+        it('user1 can put up their star for sale', async function () {
+            await contract.putStarUpForSale(starId, starPrice, {from: user1})
             
-            assert.equal(await this.contract.starsForSale(starId), starPrice)
+            assert.equal(await contract.starsForSale(starId), starPrice)
         })
 
         describe('user2 can buy a star that was put up for sale', () => { 
             beforeEach(async function () { 
-                await this.contract.putStarUpForSale(starId, starPrice, {from: user1})
+                await contract.putStarUpForSale(starId, starPrice, {from: user1})
             })
 
             it('user2 is the owner of the star after they buy it', async function() { 
-                await this.contract.buyStar(starId, {from: user2, value: starPrice, gasPrice: 0})
-                assert.equal(await this.contract.ownerOf(starId), user2)
+                await contract.buyStar(starId, {from: user2, value: starPrice, gasPrice: 0})
+                assert.equal(await contract.ownerOf(starId), user2)
             })
 
             it('user2 ether balance changed correctly', async function () { 
                 let overpaidAmount = web3.toWei(.05, 'ether')
                 const balanceBeforeTransaction = web3.eth.getBalance(user2)
-                await this.contract.buyStar(starId, {from: user2, value: overpaidAmount, gasPrice: 0})
+                await contract.buyStar(starId, {from: user2, value: overpaidAmount, gasPrice: 0})
                 const balanceAfterTransaction = web3.eth.getBalance(user2)
 
                 assert.equal(balanceBeforeTransaction.sub(balanceAfterTransaction), starPrice)

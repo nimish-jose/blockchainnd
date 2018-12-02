@@ -549,6 +549,17 @@
             // Grab the contract at specified deployed address with the interface defined by the ABI
             var starNotary = StarNotary.at('0x98f5c7ad1a22f56d42cf4cc169ea3b00ec17d649');
 
+            var starCreatedEvent = starNotary.Transfer();
+
+            starCreatedEvent.watch(function(error, result) {
+                if (!error) {
+                    console.log(result);
+                    document.getElementById('claim-status').innerText = 'Successfully claimed star id ' + result.args.tokenId.c.toString();
+                } else {
+                    console.log('watching for star claimed event is failing');
+                }
+            })
+
             // Enable claim button being clicked
             function claimButtonClicked() { 
                 web3.eth.getAccounts(function(error, accounts) { 
@@ -570,7 +581,7 @@
                             console.log(error)
                             return
                         }
-                        document.getElementById('claim-status').innerText = 'Successfully claimed star id ' + tokenId.toString()
+                        document.getElementById('claim-status').innerText = 'Initiated claim for star id ' + tokenId.toString()
                     })
                 })
             }

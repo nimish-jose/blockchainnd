@@ -18,6 +18,10 @@ npm install -g truffle
 ```
 npm install -g truffle-hdwallet-provider
 ```
+- Install Mocha Param to support parameterized unit tests
+```
+npm install --save-dev mocha-param
+```
 - Use NPM to install OpenZeppelin dependencies
 ```
 cd smart_contracts
